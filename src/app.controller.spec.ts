@@ -1,22 +1,48 @@
-import { Test, TestingModule } from '@nestjs/testing'
+import { Test } from '@nestjs/testing'
+import { JwtModule } from '@nestjs/jwt'
 import { AppController } from './app.controller'
-import { AppService } from './app.service'
+import { AuthService } from './auth/auth.service'
+import { UsersService } from './users/users.service'
+import { LocalStrategy } from './auth/local.strategy'
 
 describe('AppController', () => {
   let appController: AppController
+  let authService: AuthService
 
   beforeEach(async () => {
-    const app: TestingModule = await Test.createTestingModule({
+    const moduleRef = await Test.createTestingModule({
+      imports: [
+        JwtModule.register({
+          secret: 'JWT_SECRET'
+        })
+      ],
       controllers: [AppController],
-      providers: [AppService]
+      providers: [AuthService, UsersService, LocalStrategy]
     }).compile()
 
-    appController = app.get<AppController>(AppController)
+    authService = moduleRef.get<AuthService>(AuthService)
+    appController = moduleRef.get<AppController>(AppController)
   })
 
-  describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!')
+  describe('login', () => {
+    it('should return the jwt token', async () => {
+      const mockedReq = {
+        user: {
+          email: 'apple.seed@email.com',
+          id: 1
+        }
+      }
+
+      const result = {
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        access_token: 'fake-token'
+      }
+
+      jest
+        .spyOn(authService, 'login')
+        .mockImplementation(() => Promise.resolve(result))
+
+      expect(await appController.login(mockedReq)).toBe(result)
     })
   })
 })
