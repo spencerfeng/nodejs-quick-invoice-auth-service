@@ -45,4 +45,33 @@ describe('AppController', () => {
       expect(await appController.login(mockedReq)).toBe(result)
     })
   })
+
+  describe('validateToken', () => {
+    it('should return user info when there is a valid token', async () => {
+      const mockedToken =
+        'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpvaG4iLCJzdWIiOjEsImlhdCI6MTU4NzAyOTg0MSwiZXhwIjoxNTg3MDI5OTAxfQ.qeT50hYXfZrzpXJnT5OYtp7GJvlcM_Z497gwzCY5KCE'
+
+      const result = {
+        email: 'john.doe@email.com',
+        id: 1
+      }
+
+      jest
+        .spyOn(authService, 'validateToken')
+        .mockImplementation(() => Promise.resolve(result))
+
+      expect(await appController.validateToken(mockedToken)).toBe(result)
+    })
+
+    it('should throw an error if there is not a token', async () => {
+      const mockedToken = ''
+
+      try {
+        expect(await appController.validateToken(mockedToken))
+      } catch (err) {
+        expect(err.status).toBe(401)
+        expect(err.message).toBe('Unauthorized')
+      }
+    })
+  })
 })
