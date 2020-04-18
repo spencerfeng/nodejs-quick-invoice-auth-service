@@ -15,10 +15,28 @@ describe('AppController (e2e)', () => {
     await app.init()
   })
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!')
+  describe('/POST auth/login', () => {
+    it('should return correct response if the login credentials are correct', () => {
+      return request(app.getHttpServer())
+        .post('/auth/login')
+        .send({ email: 'john', password: 'changeme' })
+        .expect(201)
+        .then(response => {
+          expect(response.body).toHaveProperty('access_token')
+        })
+    })
+
+    it('should return 401 if the login credentials are incorrect', () => {
+      return request(app.getHttpServer())
+        .post('/auth/login')
+        .send({ email: 'notexist@email.com', password: 'changeme' })
+        .expect(401)
+        .then(err => {
+          expect(err.body).toEqual({
+            statusCode: 401,
+            message: 'Unauthorized'
+          })
+        })
+    })
   })
 })
