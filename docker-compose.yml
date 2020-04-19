@@ -1,0 +1,19 @@
+version: '3.7'
+
+services:
+  main:
+    container_name: main
+    build:
+      context: .
+      target: development
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - 3102:3002
+    command: yarn run start:dev
+    networks:
+      - nestjs-quick-invoice-auth-service-network
+
+networks:
+  nestjs-quick-invoice-auth-service-network:
