@@ -17,6 +17,7 @@ before_script:
 
 script:
   - docker-compose exec main yarn run test
+  - docker-compose exec main yarn run test:e2e
 
 after_script:
   - docker-compose down
