@@ -1,4 +1,5 @@
 FROM node:12.13-alpine as development
+RUN apk update && apk add bash
 WORKDIR /usr/src/app
 COPY package.json yarn.lock ./
 RUN yarn install
