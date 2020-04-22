@@ -1,17 +1,39 @@
 version: '3.7'
 
 services:
+  auth-service-db:
+    image: mysql:5.7
+    container_name: quick-invoice-auth-service-db
+    environment:
+      - MYSQL_DATABASE=auth-service-database
+      - MYSQL_ROOT_PASSWORD=root
+    restart: always
+    ports:
+      - 13308:3306
+    networks:
+      - nestjs-quick-invoice-auth-service-network
+
   main:
     container_name: main
     build:
       context: .
       target: development
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
     ports:
       - 3102:3002
-    command: yarn run start:dev
+    command:
+      [
+        './wait-for-it.sh',
+        'auth-service-db:3306',
+        '-s',
+        '-t',
+        '300',
+        '--',
+        'yarn',
+        'run',
+        'start:dev',
+      ]
+    depends_on:
+      - auth-service-db
     networks:
       - nestjs-quick-invoice-auth-service-network
 
