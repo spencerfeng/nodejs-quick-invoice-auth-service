@@ -1,9 +1,12 @@
 import { Test } from '@nestjs/testing'
 import { JwtModule } from '@nestjs/jwt'
+import { getRepositoryToken } from '@nestjs/typeorm'
 import { AppController } from './app.controller'
 import { AuthService } from './auth/auth.service'
 import { UsersService } from './users/users.service'
 import { LocalStrategy } from './auth/local.strategy'
+import { UserRepository } from '../test/mocks/user.repository'
+import { User } from './users/user.entity'
 
 describe('AppController', () => {
   let appController: AppController
@@ -17,7 +20,15 @@ describe('AppController', () => {
         })
       ],
       controllers: [AppController],
-      providers: [AuthService, UsersService, LocalStrategy]
+      providers: [
+        AuthService,
+        UsersService,
+        LocalStrategy,
+        {
+          provide: getRepositoryToken(User),
+          useValue: UserRepository
+        }
+      ]
     }).compile()
 
     authService = moduleRef.get<AuthService>(AuthService)
