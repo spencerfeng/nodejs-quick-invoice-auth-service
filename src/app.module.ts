@@ -6,10 +6,20 @@ import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { AuthModule } from './auth/auth.module'
 import { UsersModule } from './users/users.module'
+import { User } from './users/user.entity'
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot(),
+    TypeOrmModule.forRoot({
+      type: 'mysql',
+      host: 'auth-service-db',
+      port: 3306,
+      username: 'root',
+      password: 'root',
+      database: 'auth-service-database',
+      entities: [User],
+      synchronize: true
+    }),
     ConfigModule.forRoot(),
     AuthModule,
     UsersModule
